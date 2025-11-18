@@ -1,0 +1,35 @@
+{
+  "categories": [
+    "Barchasi",
+    "Mashxur",
+    "Maxsus",
+    "NFTlar",
+    "15-50",
+    "50-250",
+    "250+"
+  ],
+  "items": [
+    { "id": 1, "name": "iPhone 15", "price": 5000000, "category": "Mashxur" },
+    {
+      "id": 2,
+      "name": "PlayStation 5",
+      "price": "5000000",
+      "category": "Maxsus"
+    },
+    {
+      "id": 3,
+      "name": "NFT Ulkan Dragon",
+      "price": "5000000",
+      "category": "NFTlar"
+    },
+    { "id": 4, "name": "UC 30", "price": "5000000", "category": "15-50" },
+    { "id": 5, "name": "UC 180", "price": "5000000", "category": "50-250" },
+    { "id": 6, "name": "UC 300", "price": "5000000", "category": "250+" },
+    {
+      "id": 7,
+      "name": "AirPods Pro",
+      "price": "5000000",
+      "category": "Mashxur"
+    }
+  ]
+}
