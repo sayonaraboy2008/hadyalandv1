@@ -1,0 +1,24 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-decoration: none;
+  font-family: "Poppins";
+}
+body {
+  background-color: #212337;
+}
+/* Umumiy ranglar */
+.color-kumushrang {
+  color: #f8f9fa;
+}
+.color-kulrang {
+  color: #c0c0c0;
+}
+.color-binafsha-hover:hover {
+  color: #9f7aea;
+}
+.color-ochpushti-bg {
+  background-color: #7f5ac0;
+}
