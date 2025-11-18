@@ -70,7 +70,7 @@ function Prizes() {
               className="bg-[#2D2345] p-5 rounded-2xl text-white shadow-md hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-3">
               {/* Gift Image */}
               <img
-                src="/images/gift-blue.png"
+                src={item.img}
                 alt={item.name}
                 className="w-[120px] h-[140px] object-contain"
               />
