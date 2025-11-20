@@ -5,6 +5,7 @@ function Prizes() {
   const [categories, setCategories] = useState([]);
   const [active, setActive] = useState("Barchasi");
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState(""); // Xabarlarni ko'rsatish
 
   useEffect(() => {
     async function load() {
@@ -40,6 +41,27 @@ function Prizes() {
     active === "Barchasi"
       ? items
       : items.filter((item) => item.category === active);
+
+  const handleBuy = async (item) => {
+    try {
+      setMessage("Xarid jarayoni boshlanmoqda...");
+
+      const response = await fetch("https://your-backend-url.com/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gift: item.name,
+          amount: item.price,
+          for_user: "telegram_username_or_id", // Bu foydalanuvchi Telegram username/ID
+        }),
+      });
+
+      const data = await response.json();
+      setMessage(data.message || "Xarid yuborildi!");
+    } catch (err) {
+      setMessage("Xatolik yuz berdi: " + err.message);
+    }
+  };
 
   if (loading) {
     return <p className="text-white text-center mt-10">Yuklanmoqda...</p>;
@@ -88,7 +110,9 @@ function Prizes() {
                 {Number(item.price).toLocaleString("uz-UZ")} so‘m
               </p>
 
-              <button className="bg-[#A966FF] hover:bg-[#9a52ff] w-full py-3 rounded-xl text-[18px] font-semibold mt-2">
+              <button
+                onClick={() => handleBuy(item)}
+                className="bg-[#A966FF] hover:bg-[#9a52ff] w-full py-3 rounded-xl text-[18px] font-semibold mt-2">
                 Sotib olish
               </button>
             </div>
@@ -99,6 +123,9 @@ function Prizes() {
           </p>
         )}
       </section>
+
+      {/* Xabar */}
+      {message && <p className="text-center mt-4 text-yellow-400">{message}</p>}
     </div>
   );
 }
