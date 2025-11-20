@@ -2,7 +2,6 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Keyboar
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from datetime import datetime
 import os
-import json
 
 # --- TOKEN va chat ID lar ---
 BOT_TOKEN = "8072038057:AAG76HusATaqMFZwZOPUbo2NCHKr0TYngGU"
@@ -17,11 +16,17 @@ purchase_counter = 0  # Xaridlar uchun ID hisoblagichi
 # --- Klaviatura ---
 base_keyboard = [
     [KeyboardButton("/start")],
-    [KeyboardButton("/profile")]
+    [KeyboardButton("/profile")],
+    [KeyboardButton("/buy")],
+    [KeyboardButton("/cancel")]
 ]
 
 def get_keyboard(show_cancel=False):
-    keyboard = base_keyboard.copy()
+    keyboard = [
+        [KeyboardButton("/start")],
+        [KeyboardButton("/profile")],
+        [KeyboardButton("/buy")]
+    ]
     if show_cancel:
         keyboard.append([KeyboardButton("/cancel")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
@@ -40,10 +45,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Open 🌐", url=WEB_APP_URL)]])
     await update.message.reply_text(
-        f"Salom {user.first_name}!\n\nDasturimizni ishga tushirish uchun pastdagi tugmani bosing.",
+        f"Salom {user.first_name}!\n\nDasturimizni ishga tushirish uchun pastdagi tugmani bosing.\n\nBuyruqlar paneli: /profile, /buy",
         reply_markup=keyboard
     )
-    await update.message.reply_text("Buyruqlar paneli:", reply_markup=get_keyboard(show_cancel=False))
 
 # --- /profile ---
 async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -52,9 +56,10 @@ async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if username not in users_data:
         users_data[username] = {"orders": []}
 
+    orders = users_data[username]["orders"]
     profile_text = f"👤 Profilingiz:\n\n🛒 Buyurtmalar tarixi:\n"
-    if users_data[username]["orders"]:
-        for order in users_data[username]["orders"]:
+    if orders:
+        for order in orders:
             profile_text += (
                 f"{order['purchase_id']} - Gift: {order['gift']}\n"
                 f"   Kim uchun: {order['for_user']}\n"
@@ -64,42 +69,62 @@ async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
     else:
         profile_text += "Siz hali hech narsa sotib olmadingiz."
-    await update.message.reply_text(profile_text, reply_markup=get_keyboard(show_cancel=False))
+
+    await update.message.reply_text(profile_text, reply_markup=get_keyboard())
 
 # --- /cancel ---
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Xarid jarayoni bekor qilindi.", reply_markup=get_keyboard(show_cancel=False))
+    await update.message.reply_text("Xarid jarayoni bekor qilindi.", reply_markup=get_keyboard())
 
 # --- /buy ---
 async def buy(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     username = user.username or str(user.id)
+    if username not in users_data:
+        users_data[username] = {"orders": []}
+
+    # Yangi buyurtma yaratish
+    purchase_id = generate_purchase_id()
+    order = {
+        "purchase_id": purchase_id,
+        "gift": "Test Gift",
+        "for_user": username,
+        "amount": 10000,
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "status": "kutmoqda",
+        "user_id": user.id
+    }
+    users_data[username]["orders"].append(order)
+
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Open 🌐", url=WEB_APP_URL)]])
     await update.message.reply_text(
-        "Iltimos, dasturimizni ishga tushiring uchun pastdagi Open 🌐 tugmasini bosing.\n"
-        "Shundan keyin buyurtma berishingiz mumkin.",
-        reply_markup=get_keyboard(show_cancel=False)
+        f"Buyurtma yaratildi! ID: {purchase_id}\n\nPastdagi tugma orqali saytingizni oching va chek yuboring.",
+        reply_markup=keyboard
     )
 
 # --- Chek rasmini qabul qilish ---
 async def upload_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     username = user.username or str(user.id)
+
     if not update.message.photo:
         await update.message.reply_text("Iltimos, chek rasmini yuboring.")
         return
+
     if username not in users_data or not users_data[username]["orders"]:
-        await update.message.reply_text("Sizda xarid topilmadi. Avval Open 🌐 tugmasi orqali buyurtma bering.")
+        await update.message.reply_text("Sizda buyurtma topilmadi. Avval /buy bering.")
         return
 
     order = users_data[username]["orders"][-1]
-
     photo_file = await update.message.photo[-1].get_file()
+
+    os.makedirs("receipts", exist_ok=True)
     file_path = f"receipts/{order['purchase_id']}.jpg"
     await photo_file.download_to_drive(file_path)
     order["receipt"] = file_path
 
+    # Admin va kanalga yuborish
     await send_to_admin_and_channel(order, username, context)
-
     await update.message.reply_text("Chek adminga yuborildi, tasdiqlanishini kuting.", reply_markup=get_keyboard(show_cancel=True))
 
 # --- Admin va kanalga yuborish ---
@@ -119,13 +144,13 @@ async def send_to_admin_and_channel(order, username, context):
     )
 
     # Kanal
-    channel_msg = await context.bot.send_photo(
+    msg = await context.bot.send_photo(
         chat_id=CHANNEL_ID,
         photo=open(order['receipt'], "rb"),
         caption=f"📦 @{username} tomonidan yuborilgan xarid\nGift: {order['gift']}\nKim uchun: {order['for_user']}\nSummasi: {order['amount']} so'm\nStatus: {order['status']}\nID: {order['purchase_id']}",
         reply_markup=admin_keyboard
     )
-    order["channel_msg_id"] = channel_msg.message_id
+    order["channel_msg_id"] = msg.message_id
 
 # --- Admin callback ---
 async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
