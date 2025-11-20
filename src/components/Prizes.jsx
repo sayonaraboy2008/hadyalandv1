@@ -42,26 +42,34 @@ function Prizes() {
       ? items
       : items.filter((item) => item.category === active);
 
-  const handleBuy = async (item) => {
-    try {
-      setMessage("Xarid jarayoni boshlanmoqda...");
+ const handleBuy = async (item) => {
+  try {
+    setMessage("Xarid jarayoni boshlanmoqda...");
 
-      const response = await fetch("https://your-backend-url.com/buy", {
+    // Telegram bot backend URL
+    const response = await fetch(
+      "https://web-production-d1af9.up.railway.app/api/buy",
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          gift: item.name,
-          amount: item.price,
-          for_user: "telegram_username_or_id", // Bu foydalanuvchi Telegram username/ID
+          productId: item.id, // yoki item.name
+          telegramId: "123456789", // foydalanuvchi Telegram ID sini shu yerga qo‘ying
         }),
-      });
+      }
+    );
 
-      const data = await response.json();
-      setMessage(data.message || "Xarid yuborildi!");
-    } catch (err) {
-      setMessage("Xatolik yuz berdi: " + err.message);
+    const data = await response.json();
+    if(data.ok){
+      setMessage("Buyurtma yuborildi! Telegram adminga xabar keladi ✅");
+    } else {
+      setMessage("Xatolik: " + (data.msg || "Noma'lum xatolik"));
     }
-  };
+  } catch (err) {
+    setMessage("Xatolik yuz berdi: " + err.message);
+  }
+};
+
 
   if (loading) {
     return <p className="text-white text-center mt-10">Yuklanmoqda...</p>;
