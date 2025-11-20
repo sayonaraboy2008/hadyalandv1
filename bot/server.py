@@ -8,7 +8,7 @@ from flask import Flask, request, jsonify
 
 TOKEN = "8072038057:AAG76HusATaqMFZwZOPUbo2NCHKr0TYngGU"
 ADMIN_CHAT_ID = 8101156971  # Kanal yoki admin chat ID
-WEBHOOK_URL = "https://YOUR-APP-URL.onrender.com"  # Railway yoki Render URL
+WEBHOOK_URL = "https://web-production-d1af9.up.railway.app/"  # Railway yoki Render URL
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
