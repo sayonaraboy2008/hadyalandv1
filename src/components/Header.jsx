@@ -17,13 +17,23 @@ function Header() {
       {/* Desktop menu */}
       <ul className="hidden md:flex justify-between items-center gap-[30px]">
         <li>
-          <Link className="color-kulrang text-[18px]">Sovg`alar</Link>
+          <Link
+            to={"/"}
+            className="color-kulrang hover:text-[#9f7aea] text-[18px]">
+            Sovg`alar
+          </Link>
         </li>
         <li>
-          <Link className="color-kulrang text-[18px]">Qanday ishlaydi?</Link>
+          <Link
+            to={"/about"}
+            className="color-kulrang hover:text-[#9f7aea] text-[18px]">
+            Qanday ishlaydi?
+          </Link>
         </li>
         <li>
-          <Link to="/contact" className="color-kulrang text-[18px]">
+          <Link
+            to="/contact"
+            className="color-kulrang hover:text-[#9f7aea] text-[18px]">
             Bog`lanish
           </Link>
         </li>
@@ -49,13 +59,19 @@ function Header() {
           ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
         `}>
         <li>
-          <Link className="color-kulrang text-[18px]">Sovg`alar</Link>
+          <Link className="color-kulrang hover:text-[#9f7aea] text-[18px]">
+            Sovg`alar
+          </Link>
         </li>
         <li>
-          <Link className="color-kulrang text-[18px]">Qanday ishlaydi?</Link>
+          <Link className="color-kulrang hover:text-[#9f7aea] text-[18px]">
+            Qanday ishlaydi?
+          </Link>
         </li>
         <li>
-          <Link to="/contact" className="color-kulrang text-[18px]">
+          <Link
+            to="/contact"
+            className="color-kulrang hover:text-[#9f7aea] text-[18px]">
             Bog`lanish
           </Link>
         </li>
