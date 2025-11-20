@@ -1,4 +1,5 @@
 python-telegram-bot==20.3
 Flask==3.0.0
+pytelegrambotapi
 requests
 Werkzeug==3.0.0
