@@ -7,9 +7,9 @@ from flask import Flask, request, jsonify
 # ==========================
 
 # Telegram bot tokenini va admin chat ID'ni Railway environment variables orqali oling
-BOT_TOKEN = os.getenv("8072038057:AAG76HusATaqMFZwZOPUbo2NCHKr0TYngGU")  # Masalan: 8072038057:AAG76HusATaqMFZwZOPUbo2NCHKr0TYngGU
-ADMIN_CHAT_ID = int(os.getenv("8101156971"))  # Default admin ID
-WEBHOOK_URL = os.getenv("https://web-production-d1af9.up.railway.app/")  # Masalan: https://web-production-d1af9.up.railway.app/
+TOKEN = os.getenv("BOT_TOKEN")  # Masalan: 8072038057:AAG76HusATaqMFZwZOPUbo2NCHKr0TYngGU
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID","8101156971"))  # Default admin ID
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # Masalan: https://web-production-d1af9.up.railway.app/
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
